@@ -15,6 +15,23 @@ function init() {
   events = loadEvents();
   renderEvents();
   eventForm.addEventListener('submit', createEvent);
+  eventsList.addEventListener('click', onEventsListClick);
+}
+
+function onEventsListClick(e) {
+  const button = e.target.closest('button[data-action="delete"][data-id]');
+  if (!button) return;
+
+  const id = button.getAttribute('data-id');
+  deleteEventById(id);
+}
+
+function deleteEventById(id) {
+  const beforeCount = events.length;
+  events = events.filter((ev) => ev.id !== id);
+  if (events.length === beforeCount) return;
+  saveEvents();
+  renderEvents();
 }
 
 function loadEvents() {
@@ -50,6 +67,19 @@ function renderEvents() {
     eventItem.appendChild(document.createElement('br'));
 
     eventItem.appendChild(document.createTextNode(`Location: ${event.location}`));
+
+    const actions = document.createElement('div');
+    actions.className = 'event-actions';
+
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'delete-btn';
+    deleteButton.textContent = 'Delete';
+    deleteButton.setAttribute('data-action', 'delete');
+    deleteButton.setAttribute('data-id', event.id);
+
+    actions.appendChild(deleteButton);
+    eventItem.appendChild(actions);
 
     eventsList.appendChild(eventItem);
   }
